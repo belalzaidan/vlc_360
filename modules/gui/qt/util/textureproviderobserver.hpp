@@ -20,6 +20,11 @@
 
 #include <QObject>
 #include <QReadWriteLock>
+#include <QReadLocker>
+#include <QWriteLocker>
+#include <QRectF>
+#include <atomic>
+
 #include <QPointer>
 #include <QSize>
 #include <QQuickItem>
@@ -28,6 +33,38 @@ class QSGTextureProvider;
 
 // This utility class observes a texture provider and exposes its texture's properties
 // so that they can be accessed in QML where texture introspection is not possible.
+
+// Mutex-backed replacement for large atomic rectangle values.
+class VlcLockedRect
+{
+public:
+    QRectF load(std::memory_order = std::memory_order_seq_cst) const
+    {
+        QReadLocker guard(&m_lock);
+        return m_value;
+    }
+
+    void store(QRectF value,
+               std::memory_order = std::memory_order_seq_cst)
+    {
+        QWriteLocker guard(&m_lock);
+        m_value = value;
+    }
+
+    QRectF exchange(QRectF value,
+                    std::memory_order = std::memory_order_seq_cst)
+    {
+        QWriteLocker guard(&m_lock);
+        QRectF previous = m_value;
+        m_value = value;
+        return previous;
+    }
+
+private:
+    mutable QReadWriteLock m_lock;
+    QRectF m_value{};
+};
+
 class TextureProviderObserver : public QObject
 {
     Q_OBJECT
@@ -153,8 +190,8 @@ private:
     std::atomic<QSize> m_oldNativeTextureSize {{}}; // invalid by default
     std::atomic<qint64> m_comparisonKey {-1};
     std::atomic<qint64> m_oldComparisonKey {-1};
-    std::atomic<QRectF> m_normalizedTextureSubRect {{}}; // invalid by default
-    std::atomic<QRectF> m_oldNormalizedTextureSubRect {{}}; // invalid by default
+    VlcLockedRect m_normalizedTextureSubRect; // invalid by default
+    VlcLockedRect m_oldNormalizedTextureSubRect; // invalid by default
 
     std::atomic<bool> m_hasAlphaChannel = false;
     std::atomic<bool> m_hasMipmaps = false;
