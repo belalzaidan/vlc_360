@@ -409,8 +409,22 @@ static void MouseEventCb(const vlc_mouse_t *newmouse, void *userdata)
 
     const es_format_t *fmt = id->fmt_out.i_cat != UNKNOWN_ES ? &id->fmt_out : &id->fmt;
 
-    if (fmt->video.projection_mode != PROJECTION_MODE_RECTANGULAR) {
-        if (vlc_mouse_HasDragged( &id->oldmouse, newmouse )) {
+//    if (fmt->video.projection_mode != PROJECTION_MODE_RECTANGULAR) {
+//        if (vlc_mouse_HasDragged( &id->oldmouse, newmouse )) {
+//            id->mouse_being_dragged = true;
+//        }
+//    };
+//
+//======================================================================================
+// Instead of checking the projection mode from metadata, we get it from the input variable 
+// "projection-mode" which is set by the user.
+//
+//
+    int projection = var_InheritInteger(p_sys->p_input, "projection-mode");
+
+    if (projection == -1) projection = fmt->video.projection_mode; // This means that the user has not set the projection mode, so we use the one from the metadata.
+    if (projection != PROJECTION_MODE_RECTANGULAR) {
+        if (vlc_mouse_HasDragged(&id->oldmouse, newmouse)) {
             id->mouse_being_dragged = true;
         }
     };
