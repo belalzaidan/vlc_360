@@ -263,7 +263,12 @@ static bool PlaceVideoInDisplay(vout_display_priv_t *osys)
 {
     struct vout_display_placement place_cfg = osys->cfg.display;
     vout_display_place_t prev_place = osys->src_place;
-    vout_display_PlacePicture(&osys->src_place, &osys->source, &place_cfg);
+    
+    video_format_t placement_source = osys->source;
+    placement_source.projection_mode = osys->cfg.projection;
+
+    vout_display_PlacePicture(&osys->src_place, &placement_source, &place_cfg);
+
     return !vout_display_PlaceEquals(&prev_place, &osys->src_place);
 }
 
