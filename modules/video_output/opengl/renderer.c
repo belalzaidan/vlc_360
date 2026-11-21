@@ -836,16 +836,20 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     renderer->dump_shaders = var_InheritInteger(filter, "verbose") >= 4;
 
     int projection_mode = var_InheritInteger(filter, "projection-mode");
-    switch (projection_mode)
-    {
-        case PROJECTION_MODE_RECTANGULAR:
-            renderer->projection_mode = projection_mode;
-            break;
-        default:
-        case -1:
-            renderer->projection_mode = sampler->fmt_in.projection_mode;
-            break;
-    }
+    renderer->projection_mode =
+    projection_mode == -1
+        ? sampler->fmt_in.projection_mode
+        : projection_mode;
+//    switch (projection_mode)
+//    {
+//        case PROJECTION_MODE_RECTANGULAR:
+//        case PROJECTION_MODE_EQUIRECTANGULAR:
+//        case PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD:
+//            
+//            break;
+//    }
+
+//    renderer->projection_mode = PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD;
 
     int stereo_mode = var_InheritInteger(filter, "video-stereo-mode");
     if (stereo_mode > VIDEO_STEREO_OUTPUT_AUTO && stereo_mode <= VIDEO_STEREO_OUTPUT_MAX)
