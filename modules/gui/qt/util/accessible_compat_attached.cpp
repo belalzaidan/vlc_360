@@ -18,7 +18,7 @@
 
 #include "accessible_compat_attached.hpp"
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0) && defined(QT_DECLARATIVE_PRIVATE)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0) && defined(QT_DECLARATIVE_PRIVATE) && QT_CONFIG(accessibility)
 #include <private/qquickaccessibleattached_p.h>
 #define ACCESSIBLE_COMPAT_OK
 #endif

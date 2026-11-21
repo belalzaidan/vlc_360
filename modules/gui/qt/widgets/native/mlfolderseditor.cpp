@@ -152,7 +152,9 @@ void MLFoldersEditor::newRow(const QUrl &mrl)
 
         QPushButton *pb = new QPushButton( icon , wid );
         pb->setFixedSize( 18 , 18 );
+        #if QT_CONFIG(accessibility)
         pb->setAccessibleName(accessibleName);
+        #endif
 
         layout->addWidget( pb , Qt::AlignCenter );
         wid->setLayout( layout );

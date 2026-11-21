@@ -138,3 +138,6 @@ endif
 	+PATH="$(PATH):$(PREFIX)/bin" $(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
+
+# Temporary workaround for older LLVM MinGW UI Automation headers
+QTBASE_CONFIG += -DFEATURE_accessibility=OFF
